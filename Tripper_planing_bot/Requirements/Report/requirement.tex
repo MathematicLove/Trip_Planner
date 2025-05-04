@@ -1,0 +1,412 @@
+\documentclass[areasetadvanced]{scrartcl}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T2A]{fontenc}
+\usepackage[english,russian]{babel}
+
+\usepackage[footskip=1cm,left=25mm, right=15mm, top=20mm, bottom=20mm]{geometry}
+\usepackage{setspace}
+\usepackage{amsmath, amssymb}  % Объединено в одну строку
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta}
+\usepackage{float}
+\usepackage{dashrule}
+\usepackage{fancyhdr} % оформление отчёта
+\usepackage{hyperref} % оформление отчёта
+\usepackage{parskip}
+\usepackage{textcomp, enumitem}
+\usepackage{indentfirst}
+\usepackage{graphicx}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{array}  % Для использования команды m{}
+\usepackage{geometry}
+\usepackage{afterpage}
+\usepackage{minted}
+\usepackage{longtable}
+\setcounter{secnumdepth}{3}  % Включает нумерацию для subsubsection
+\setcounter{tocdepth}{3}     % Включает subsubsection в содержание
+\usepackage{listings} % Если используете listings
+
+\tikzstyle{block} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=lightgray]
+
+\setkomafont{sectioning}{\normalfont\bfseries} % для заголовков разделов и подразделов
+\setkomafont{section}{\normalfont\Large\bfseries}
+\setkomafont{subsection}{\normalfont\large\bfseries}
+\setkomafont{subsubsection}{\normalfont\large\bfseries}
+\setkomafont{paragraph}{\normalfont\large\bfseries} % для заголовков параграфов (если они есть)
+
+\lstset{
+  language=Haskell,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{blue}\bfseries,
+  stringstyle=\color{red},
+  commentstyle=\color{green!70!black},
+  numbers=left,
+  numberstyle=\tiny,
+  stepnumber=1,
+  numbersep=10pt,
+  showstringspaces=false,
+  breaklines=true,
+  frame=single
+}
+
+\setcounter{secnumdepth}{4}   % нумерация до subsubsection
+\setcounter{tocdepth}{4}      % включение subsubsection в оглавление
+\begin{document}
+\renewcommand{\contentsname}{}
+\sloppy
+\tableofcontents
+\newpage
+
+\section*{Введение}
+\addcontentsline{toc}{section}{Введение}
+В данном документе содержатся требования к реализуемому проекту: телеграм-бот "trip planner".
+Который позволит систематизировать процесс планирования, проведения и удерживания истории поездок.
+
+\newpage
+\section{Основные функции}
+\begin{itemize}
+  \item Автоматическая авторизация по Telegram ChatID и создание персонального профиля, что позволяет привязывать все данные к конкретному пользователю.
+  \item Планирование поездок: задание названия, дат начала и конца, а также добавление точек (города, достопримечательности) и проведения маршрута между нимы с датами начала и конца.  Возможность просмотра и удаления запланированных поездок.
+  \item Ассистирование в путешествии: напоминания за сутки и в день старта, отметка чек-инов по геолокации или вручную и возможность добавлять заметки о каждом месте.
+  \item Ведение истории завершённых поездок с возможностью просмотра детальных данных (маршрут, даты, заметки) и выставления оценки.
+  \item Надёжная обработка ошибок: понятные уведомления о некорректном вводе, повторные попытки при сбоях внешних сервисов и информирование об ограничениях или недоступности функций.
+\end{itemize}
+\newpage
+\section{Требования к реализации}
+
+Данный раздел описывает требования, предъявляемые к реализации проекта Telegram-бота \textbf{Trip Planner}.
+
+\subsection{Общие требования}
+
+\subsubsection{Система контроля версиями}
+\textbf{Ответственные:} Команда разработчиков и преподаватель.
+
+\textbf{Действия:}
+\begin{itemize}
+  \item Код размещается в приватном репозитории GitHub.
+  \item Репозиторий содержит инструкцию (\texttt{README.md}) для:
+    \begin{itemize}
+      \item Локальной настройки окружения.
+      \item Сборки и запуска проекта.
+      \item Деплоя приложения с помощью Docker.
+      \item Прямого взаимодействия с ботом.
+    \end{itemize}
+  \item Docker-образ публикуется на Docker Hub.
+\end{itemize}
+
+\subsubsection{Целевые артефакты}
+\textbf{Ответственные:} Команда разработчиков.
+
+\textbf{Действия:}
+\begin{itemize}
+  \item Приложение формирует исполняемый \textbf{Fat JAR}.
+  \item Приложение упаковывается и разворачивается через Docker.
+  \item Используется Gradle (\texttt{build.gradle.kts}) для управления сборкой и зависимостями.
+\end{itemize}
+
+\subsection{Функциональные требования}
+
+\subsubsection{Аутентификация пользователей}
+\textbf{Ответственные:} Система (бот).
+
+\textbf{Действия:}
+\begin{itemize}
+  \item Пользователь идентифицируется автоматически по Telegram ChatID.
+  \item ChatID записывается в базу данных автоматически при первом взаимодействии с ботом (команда: \texttt{/start}).
+\end{itemize}
+
+\subsubsection{Планирование поездки}
+\textbf{Ответственные:} Конечный пользователь.
+
+\textbf{Действия:}
+\begin{itemize}
+  \item Создание поездки (название, даты, точки и маршрут с датами):
+  \begin{itemize}
+    \item \texttt{/plantrip Summer2025 2025-07-10 2025-07-20}
+    \item \texttt{/addpoint Rome 41.887064, 12.504809}
+    \item \texttt{/addpoint Florencia 43.781480, 11.255504}
+    \item \texttt{/setstartpoint Rome}
+    \item \texttt{/addroute Florencia 2025-07-15}
+    \item \texttt{/addroute Rome 2025-07-19}
+    \item \texttt{/finishplan}
+  \end{itemize}
+  \item Просмотр запланированных поездок: \texttt{/showplanned}
+  \item Удаление поездок (с подтверждением): \texttt{/deleteplanned Summer2025}
+\end{itemize}
+
+\subsubsection{Помощник в поездке}
+\textbf{Ответственные:} Система (бот), Конечный пользователь.
+
+\textbf{Действия:}
+\begin{itemize}
+  \item Система отправляет уведомления за день и в день начала поездки автоматически.
+  \item Пользователь отмечает посещённые точки:
+  \begin{itemize}
+    \item Автоматически (бот запрашивает геопозицию через Telegram)
+    \item Ручная отметка: \texttt{/markpoint Rome}
+  \end{itemize}
+  \item Пользователь добавляет заметки к посещённым точкам командой: \texttt{/addnote Rome Красивый город!}
+\end{itemize}
+
+\subsubsection{История поездок}
+\textbf{Ответственные:} Конечный пользователь.
+
+\textbf{Действия:}
+\begin{itemize}
+  \item Просмотр всех завершённых поездок: \texttt{/triphistory}
+  \item Просмотр деталей конкретной поездки (маршрут, заметки, даты): \texttt{/tripdetails 3}
+  \item Оценка поездок: \texttt{/ratetrip 3 5} (0–5 баллов)
+\end{itemize}
+
+\subsubsection{Уведомления о поездках}
+\textbf{Ответственные:} Конечный пользователь, Система (бот).
+
+\subsection{Обращение с ошибкой}
+\begin{enumerate}
+  \item Пользователь пытается вызвать несуществующую команду.
+  \item Бот отправляет сообщение: «Неизвестная команда. Введите /help для списка доступных команд.»
+  \item При повторяющейся ошибке, бот предлагает помощь и ссылку на инструкцию.
+\end{enumerate}
+
+\subsection{Нефункциональные требования}
+
+\subsubsection{Безопасность}
+\textbf{Действия:}
+\begin{itemize}
+  \item Безопасное хранение ChatID и данных о поездках.
+  \item API-токены и конфигурация базы данных хранятся в файле окружения (\texttt{.env}).
+\end{itemize}
+
+\subsubsection{Производительность}
+\textbf{Требования:}
+\begin{itemize}
+  \item Время ответа системы $\leq$ 500 мс (не учитывая задержек внешних API).
+  \item Поддержка одновременного использования до 100\,000 пользователей.
+\end{itemize}
+
+\subsubsection{Надёжность и поддержка}
+\textbf{Действия:}
+\begin{itemize}
+  \item При ошибке обращения к внешнему API, система делает две повторные попытки запроса с интервалом в 5 секунд.
+\end{itemize}
+
+\subsubsection{Роли пользователей}
+\textbf{Действия:}
+\begin{itemize}
+  \item \textbf{Конечный пользователь} (идентификация по ChatID):
+  \begin{itemize}
+    \item Создание, просмотр и оценка поездок, добавление заметок.
+    \item Отправка сообщений.
+  \end{itemize}
+  \item \textbf{Администратор} (идентификация по API-ключу):
+  \begin{itemize}
+    \item Просмотр пользователей, мониторинг системы, отправление оповещательных сообщений всем пользователям.
+  \end{itemize}
+\end{itemize}
+
+\newpage
+\section{Требования к технологическому стеку}
+\begin{itemize}
+\item \textbf{Язык программирования:} Java SE 23.
+\item \textbf{Фреймворк:} Spring 6.2 (WebFlux, JPA, Modulith).
+\item \textbf{Telegram API:} Приложение должно интегрироваться с
+  Telegram API для предоставления функциональности бота.
+\item \textbf{База данных:} MongoDB.
+\item \textbf{Контейнеризация:} Docker, Docker Compose.
+\item \textbf{Логирование:} SLF4J, Log4j.
+\item \textbf{Тестирование:} JUnit, Mockito.
+\end{itemize}
+\newpage
+\section{Требования к документации}
+Должна быть написана документация для API с использованием Spring Docs.
+\subsection{Документ «Требования к проекту»}
+Предоставить документ с требованиями, который включает:
+\begin{itemize}
+  \item Цель и функциональность приложения.
+  \item Ключевые функции Telegram‑бота.
+  \item Нефункциональные требования.
+  \item Любые предположения или ограничения.
+\end{itemize}
+
+\subsection{Документ «Архитектура проекта»}
+Предоставить документ по архитектуре, который включает:
+\begin{itemize}
+  \item Компонентные диаграмму бота и схема базы данных.
+  \item Описание того, как приложение будет строиться, развертываться и запускаться.
+\end{itemize}
+
+\newpage
+\section{Требования к тестированию}
+\begin{itemize}
+\item Должны быть реализованы unit-тесты и интеграционные тесты для
+  всех модулей.
+\item Обеспечить покрытие кода тестами не менее 60\%.
+\end{itemize}
+\newpage
+
+\section{Голоссарий}
+\subsection{Термины предметной области}
+\begin{itemize}
+  \item \textbf{Поездка} --- любое запланированное путешествие пользователя от точки «А» до точки «Б» с указанием времени, участников и прочих условий.
+  \item \textbf{Путевая точка (point)} --- отдельная позиция на маршруте (город, достопримечательность и т.\,д.), через которую проходит поездка.
+  \item \textbf{Маршрут} --- путь между двумя путевыми точками внутри поездки.
+  \item \textbf{Статус поездки} --- текущее состояние плана: «запланирована», «текущая», «завершена».
+  \item \textbf{Location (Место)} --- географическая точка с координатами и описанием (город, адрес, достопримечательность).
+  \item \textbf{Геопозиция} --- текущее или заданное местоположение на земной поверхности, обычно выраженное в широте и долготе.
+  \item \textbf{Бот} --- программа, которая автоматически выполняет определённые задачи по заданным правилам или алгоритмам.
+  \item \textbf{ТГ‑бот (телеграм‑бот)} --- бот, интегрированный с мессенджером Telegram: отвечает на сообщения пользователей, выполняет команды и взаимодействует через чат в Telegram.
+\end{itemize}
+\subsection{Основные термины}
+\begin{description}
+\item[Telegram] Многофункциональный мессенджер, который позволяет
+  пользователям обмениваться сообщениями.
+\item[Telegram-бот] Программа в мессенджере Telegram, автоматически
+  обрабатывающая команды пользователей.
+\item[ChatID] Уникальный идентификатор пользователя/чата в Telegram,
+  используемый для аутентификации.
+\end{description}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Функциональные модули}
+\begin{description}
+\item[AdminModule] Модуль администрации системы.
+\item[HealthcheckModule] Модуль проверки состояния сервера.
+\item[PlannedTripsModule] Модуль планирования поездок.
+\item[TripHelperModule] Модуль помощник c поездкой.
+\item[TripHistoryModule] Модуль истории поездок.
+\end{description}
+
+\subsection{Технические термины}
+\begin{description}
+\item[Fat JAR] Исполняемый JAR-файл со всеми зависимостями.
+\item[API] Набор способов и правил, по которым различные программы
+  общаются между собой и обмениваются данными.
+\item[API-ключ] Секретный уникальный идентификатор, используемый для
+  аутентификации и авторизации пользователя, разработчика или
+  вызывающей программы в API.
+\item[Telegram API] Набор инструментов, который позволяет
+  разработчикам программно взаимодействовать с платформой Telegram.
+\item[Валидация] Процесс проверки и подтверждения того, что продукт,
+  система или процесс будут функционировать должным образом и
+  удовлетворять ожидания пользователей.
+\item[Эндпоинт] Конечная точка веб-сервиса, к которой клиентское
+  приложение обращается для выполнения определённых операций или
+  получения данных.
+\item[HTTP] Протокол передачи гипертекста. Это набор правил, по
+  которым данные в интернете передаются между разными источниками,
+  обычно между компьютерами и серверами.
+\item[БД] Набор структурированных данных, предназначенный для
+  хранения, обработки и изменения большого количества информации.
+\item[MongoDB] документоориентированная система управления базами данных.
+\item[Логирование] Процесс записи и хранения информации о событиях,
+  действиях и состояниях системы, приложений или пользователей.
+\item[Фреймворк] Набор инструментов, библиотек и правил, который
+  помогает разработчику быстро создать продукт: сайт, приложение.
+\end{description}
+
+\subsection{Процесс разработки}
+\begin{description}
+\item[Gradle] Система сборки проекта.
+\item[JUnit/Mockito] Фреймворки для модульного тестирования.
+\item[GitHub] Это веб-сервис для хостинга IT-проектов и их совместной
+  разработки.
+\item[Контейнеризация] Метод, с помощью которого программный код
+  упаковывается в единый исполняемый файл вместе с библиотеками и
+  зависимостями, чтобы обеспечить его корректный запуск.
+\item[Docker] Платформа для контейнеризации приложения.
+\item[Docker-образ] Шаблон (физически --- исполняемый пакет), из
+  которого создаются Docker-контейнеры.
+\item[Docker-контейнер] Стандартизированный, изолированный и
+  портативный пакет программного обеспечения, который включает в себя
+  всё необходимое для запуска приложения.
+\item[Docker Hub] Облачная платформа для публикации, хранения и
+  распространения Docker-образов.
+\end{description}
+
+\subsection{Форматы данных}
+\begin{description}
+\item[JSON] Формат обмена данными с внешними API.
+\item[DATE] Дата в формате \texttt{ГГГГ-ММ-ДД}.
+\end{description}
+
+\subsection{Тестирование}
+\begin{description}
+\item[Тестирование] Проверка на соответствие заявленной спецификации.
+\item[Unit-тесты] Проверка отдельных частей кода на корректность
+  работы. В программировании под словом «юнит» чаще понимают функцию,
+  метод или класс в исходном коде.
+\item[Интеграционные тесты] Проверка отдельных модулей или компонентов
+  приложения на совместимость друг с другом.
+\end{description}
+\newpage
+\subsection{Команды бота}
+\begin{longtable}{|p{.2\textwidth}|p{.25\textwidth}|p{.2\textwidth}|p{.25\textwidth}|} \hline
+  \textbf{Команда}         & \textbf{Формат}                         & \textbf{Пример}                                 & \textbf{Описание}                                                               \\ \hline
+  \texttt{/start}          & \texttt{/start}                         & \texttt{/start}                                 & Начало работы с ботом. Приветствие и вывод основных опций.                      \\ \hline
+  \texttt{/help}           & \texttt{/help}                          & \texttt{/help}                                  & Выводит список доступных команд и инструкции по использованию.                  \\ \hline
+  \texttt{/showplanned}      & \texttt{/showlanned}                     & \texttt{/showplanned}                             & Отображает список всех запланированных поездок пользователя с их ID и названиями.               \\ \hline
+  \texttt{/plantrip}        & \texttt{/plantrip <название\_поездки> <дата\_начала> <дата\_конца>}   & \texttt{/plantrip Paris2024 2024-01-01 2024-02-01}                     & Создает новую поездку с указанным названием.                                    \\ \hline
+  \texttt{/addpoint} & \texttt{/addpoint <название> <широта> <долгота>} & \texttt{/addpoint EiffelTower 48.858247, 2.294494} & Добавляет пункт назначения в текущую поездку.     \\ \hline
+  \texttt{/setstartpoint} & \texttt{/setstartpoint <ID\_точки>} & \texttt{/setstartpoint 1} & Устанавливает начальную точку поездки.     \\ \hline
+  \texttt{/addroute} & \texttt{/addroute <ID\_точки> <дата>} & \texttt{/addroute 1 2020-20-02} & Добавляет маршрут к следущей точке.     \\ \hline
+  \texttt{/finishplanning} & \texttt{/finishplanning} & \texttt{/finishplanning} & Завершает планирование поездки.     \\ \hline
+  \texttt{/cancelplanning} & \texttt{/cancelplanning} & \texttt{/cancelplanning} & Отмена планирование поездки.     \\ \hline
+  \texttt{/deleteplanned}     & \texttt{/deleteplanned <ID\_поездки>}      & \texttt{/deletetrip 5}                          & Удаляет поездку по указанному ID (ID можно получить через \texttt{/viewtrips}). \\ \hline
+  \texttt{/showongoingtrip} & \texttt{/showongoingtrip} & \texttt{/showongoingtrip} & Отображает информацию о текущей поездке.     \\ \hline
+  \texttt{/markpoint} & \texttt{/markpoint <ID\_точки>} & \texttt{/markpoint 1} & Отмечает точку как посещенную.     \\ \hline
+  \texttt{/addnote} & \texttt{/addnote <ID\_точки> <заметка>} & \texttt{/addnote 1 Погода не вышла} & Добавляет заметку к точке.     \\ \hline
+  \texttt{/triphistory}      & \texttt{/triphistory}                     & \texttt{/triphistory}                             & Отображает список всех завершённых поездок пользователя с их ID и названиями.               \\ \hline
+  \texttt{/finisheddetails}      & \texttt{/finisheddetails} <ID\_поездки>    & \texttt{/finisheddetails 1}         & Отображает подробную информацию о завершенной поездке.               \\ \hline
+  \texttt{/ratefinished}      & \texttt{/ratefinished} <ID\_поездки> <оценка>           & \texttt{/ratefinished 1 5}                             & Установливает указанной поездке указанную оценку.               \\ \hline
+\end{longtable}
+\newpage
+\section{Исключительные ситуации}
+\begin{itemize}
+  \item Ошибка подключения к внешнему API (например, погода, LLM): \begin{itemize}
+    \item Повторить запрос 2 раза с интервалом в 5 секунд.
+    \item При неудаче — отправить сообщение пользователю о временной недоступности функции.
+  \end{itemize}
+  \item Ошибка базы данных: \begin{itemize}
+    \item Сохранить информацию об ошибке в логах.
+    \item Сообщить пользователю о технической ошибке.
+  \end{itemize}
+  \item Некорректный ввод команды: \begin{itemize}
+    \item Отправить сообщение с корректным форматом команды.
+    \item Предложить помощь с использованием команды \texttt{/help}.
+  \end{itemize}
+  \item Попытка доступа к чужим данным (по ошибке или намеренно): \begin{itemize}
+    \item Заблокировать действие.
+    \item Сообщить пользователю, что доступ ограничен.
+    \item Зафиксировать инцидент в логах для анализа.
+  \end{itemize}
+\end{itemize}
+\newpage
+\section{Пользовательские сценарии}
+\subsection{Создание и сопровождение поездки}
+\begin{enumerate}
+  \item Пользователь вводит команду \texttt{/plantrip Paris2025 2025-07-10 2025-07-17}
+  \item Бот предлагает добавить пункты → пользователь использует \texttt{/addpoint EiffelTower 48.858247, 2.294494}
+        \item Пользователь вводит команду \texttt{/finishplanning}
+  \item По завершении планирования, бот добавляет поездку в запланированные и отображает информацию.
+  \item В день поездки бот отправляет уведомление и предлагает сопровождение.
+  \item Во время маршрута пользователь может отметить посещённые точки, добавить заметки.
+  \item По завершении поездки бот переносит маршрут в историю и предлагает оценить.
+\end{enumerate}
+\newpage
+\section{Краткая инструкция пользователя}
+\begin{itemize}
+  \item Для начала работы с ботом используйте команду \texttt{/start}
+  \item Все команды начинаются со знака \texttt{/}, например, \texttt{/help}
+  \item Чтобы запланировать поездку: \begin{itemize}
+    \item Введите \texttt{/plantrip <название> <начальная\_дата> <конечная\_дата>}
+    \item Добавьте пункты маршрута: \texttt{/addpoint <название> <широта> <долгота>}
+            \item Укажите начальную точку: \testtt{/setstartpoint <название>}
+            \item Укажите переход в следующую точку: \testtt{/addroute <название\_точки> <дата\_прибытия>}
+  \end{itemize}
+  \item Для просмотра запланированных поездок: \texttt{/showplanned}
+  \item Для удаления поездки: \texttt{/deleteplanned <номер\_поездки>}
+\end{itemize}
+
+\end{document}

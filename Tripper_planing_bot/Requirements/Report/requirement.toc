@@ -1,0 +1,39 @@
+\babel@toc {russian}{}\relax 
+\contentsline {section}{Введение}{2}{section*.2}%
+\contentsline {section}{\numberline {1}Основные функции}{3}{section.1}%
+\contentsline {section}{\numberline {2}Требования к реализации}{4}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Общие требования}{4}{subsection.2.1}%
+\contentsline {subsubsection}{\numberline {2.1.1}Система контроля версиями}{4}{subsubsection.2.1.1}%
+\contentsline {subsubsection}{\numberline {2.1.2}Целевые артефакты}{4}{subsubsection.2.1.2}%
+\contentsline {subsection}{\numberline {2.2}Функциональные требования}{4}{subsection.2.2}%
+\contentsline {subsubsection}{\numberline {2.2.1}Аутентификация пользователей}{4}{subsubsection.2.2.1}%
+\contentsline {subsubsection}{\numberline {2.2.2}Настройки пользователя}{4}{subsubsection.2.2.2}%
+\contentsline {subsubsection}{\numberline {2.2.3}Планирование поездки}{5}{subsubsection.2.2.3}%
+\contentsline {subsubsection}{\numberline {2.2.4}Помощник в поездке}{5}{subsubsection.2.2.4}%
+\contentsline {subsubsection}{\numberline {2.2.5}История поездок}{5}{subsubsection.2.2.5}%
+\contentsline {subsubsection}{\numberline {2.2.6}Уведомления о поездках}{5}{subsubsection.2.2.6}%
+\contentsline {subsection}{\numberline {2.3}Обращение с ошибкой}{6}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.4}Нефункциональные требования}{6}{subsection.2.4}%
+\contentsline {subsubsection}{\numberline {2.4.1}Безопасность}{6}{subsubsection.2.4.1}%
+\contentsline {subsubsection}{\numberline {2.4.2}Производительность}{6}{subsubsection.2.4.2}%
+\contentsline {subsubsection}{\numberline {2.4.3}Надёжность и поддержка}{6}{subsubsection.2.4.3}%
+\contentsline {subsubsection}{\numberline {2.4.4}Роли пользователей}{6}{subsubsection.2.4.4}%
+\contentsline {section}{\numberline {3}Требования к технологическому стеку}{7}{section.3}%
+\contentsline {section}{\numberline {4}Требования к документации}{8}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Документ «Требования к проекту»}{8}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Документ «Архитектура проекта»}{8}{subsection.4.2}%
+\contentsline {section}{\numberline {5}Требования к тестированию}{9}{section.5}%
+\contentsline {section}{\numberline {6}Голоссарий}{10}{section.6}%
+\contentsline {subsection}{\numberline {6.1}Термины предметной области}{10}{subsection.6.1}%
+\contentsline {subsection}{\numberline {6.2}Основные термины}{10}{subsection.6.2}%
+\contentsline {subsection}{\numberline {6.3}Функциональные модули}{10}{subsection.6.3}%
+\contentsline {subsection}{\numberline {6.4}Технические термины}{10}{subsection.6.4}%
+\contentsline {subsection}{\numberline {6.5}Процесс разработки}{11}{subsection.6.5}%
+\contentsline {subsection}{\numberline {6.6}Форматы данных}{11}{subsection.6.6}%
+\contentsline {subsection}{\numberline {6.7}Тестирование}{12}{subsection.6.7}%
+\contentsline {subsection}{\numberline {6.8}Команды бота}{13}{subsection.6.8}%
+\contentsline {section}{\numberline {7}Исключительные ситуации}{14}{section.7}%
+\contentsline {section}{\numberline {8}Пользовательские сценарии}{15}{section.8}%
+\contentsline {subsection}{\numberline {8.1}Создание и сопровождение поездки}{15}{subsection.8.1}%
+\contentsline {section}{\numberline {9}Краткая инструкция пользователя}{16}{section.9}%
+\providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 

@@ -1,0 +1,75 @@
+services:
+  postgres:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_DB: tripsdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: secret
+    ports:
+      - "5432:5432"
+
+  mongo:
+    image: mongo:6.0
+    restart: always
+    environment:
+      MONGO_INITDB_DATABASE: tripsdb
+    ports:
+      - "27017:27017"
+
+  zookeeper:
+    image: zookeeper:3.8.1
+    restart: always
+    environment:
+      ZOO_CLIENT_PORT: 2181
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: bitnami/kafka:3.6.1
+    restart: always
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: "1"
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      ALLOW_PLAINTEXT_LISTENER: "yes"
+      KAFKA_LISTENERS: PLAINTEXT://:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
+    ports:
+      - "9092:9092"
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_started
+      mongo:
+        condition: service_started
+      kafka:
+        condition: service_started
+    environment:
+      # API-ключ для /admin и /users
+      ADMIN_API_KEY: 809C2F57-8B56-431E-B086-7DA4451EE148
+      # Spring-конфигурация через переменные
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/tripsdb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: secret
+
+      SPRING_DATA_MONGODB_URI: mongodb://mongo:27017
+      SPRING_DATA_MONGODB_DATABASE: tripsdb
+
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+
+      TELEGRAM_BOT_TOKEN: 7935856097:AAHbBkRCON2F4CHU24aPhOxw7htRHJQz_xQ
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/healthcheck"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
